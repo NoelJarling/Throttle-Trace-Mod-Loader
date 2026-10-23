@@ -59,9 +59,3 @@ To uninstall, delete `override.cfg` from the game folder. To remove everything, 
 - **Mods stopped working after an update or "Verify integrity of game files":** Steam may have removed `override.cfg`. Copy it back into the game folder.
 - **Mods don't load at all:** check that the launch options contain `%command% --enable-mods`. Without it the log shows `[ModLoader] mods disabled`.
 - **Logs:** `logs/godot.log` in the user data folder. Mod loader messages start with `[ModLoader]`.
-
-## Writing a mod
-
-- A mod is a folder `mods/<name>/` with a `mod.gd` that `extends Node`, or a `.pck`/`.zip` in `mods/` that contains `res://mods/<name>/mod.gd`.
-- The loader adds each mod as a child of the `ModLoader` autoload, in alphabetical order, so a mod's `_ready()` runs after all of the game's autoloads.
-- To replace one of the game's scripts, write a script that `extends "res://path/to/original.gd"` and call `ModLoader.install_script_extension("res://mods/<name>/<script>.gd")` from your mod's `_ready()`. This only affects objects the game creates afterwards.
