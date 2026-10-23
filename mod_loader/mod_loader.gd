@@ -41,14 +41,3 @@ func _load_mods() -> void:
 		loaded_mods[mod.name] = mod
 		add_child(mod)
 		print("[ModLoader] loaded mod ", mod.name)
-
-
-## Replace a game script with a subclass of it. Call from a mod's _init() or _ready(),
-## BEFORE the game instantiates the target (works for scenes loaded later, not for autoloads already running).
-## child_script_path's script must `extends "res://path/to/original.gd"`.
-func install_script_extension(child_script_path: String) -> void:
-	var child: Script = load(child_script_path)
-	var parent: Script = child.get_base_script()
-	child.new()  # force compile/caching of the chain
-	child.take_over_path(parent.resource_path)
-	print("[ModLoader] extended ", parent.resource_path, " with ", child_script_path)
