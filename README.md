@@ -7,7 +7,7 @@ Mods that use it:
 - [Throttle Trace Rivals](https://github.com/NoelJarling/Throttle-Trace-Rivals): race your friends' personal-best ghosts in Time Attack
 - [Throttle Trace Telemetry](https://github.com/NoelJarling/Throttle-Trace-Telemetry): record your laps and compare them in the browser
 
-Built for Throttle Trace v0.40.0 (Godot 4.6). Game updates may break it.
+Built for Throttle Trace v0.40.1 (Godot 4.6). Game updates may break it.
 
 ## Install
 
