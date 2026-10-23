@@ -2,9 +2,7 @@ extends Node
 ## Minimal mod loader for Throttle Trace.
 ## Injected via override.cfg next to the game executable.
 ##
-## Mods live in user://mods/. Each mod is either:
-##   - a folder  user://mods/<name>/  containing mod.gd
-##   - a .pck/.zip  user://mods/<name>.pck  (mounted into res://, may contain res://mods/<name>/mod.gd)
+## Mods live in user://mods/, each one a folder user://mods/<name>/ containing mod.gd.
 ## mod.gd must `extends Node`; it is added as a child of this loader, so _ready() runs after all game autoloads.
 ##
 ## Mods are only loaded when the game is started with --enable-mods
@@ -23,32 +21,14 @@ func _ready() -> void:
 		return
 	print("[ModLoader] starting, scanning ", ProjectSettings.globalize_path(MODS_DIR))
 	DirAccess.make_dir_recursive_absolute(MODS_DIR)
-	_mount_packs()
 	_load_mods()
 
 
-func _mount_packs() -> void:
-	for file in DirAccess.get_files_at(MODS_DIR):
-		if file.get_extension() in ["pck", "zip"]:
-			var ok := ProjectSettings.load_resource_pack(MODS_DIR.path_join(file), true)
-			print("[ModLoader] mounted pack ", file, " -> ", ok)
-
-
 func _load_mods() -> void:
-	# name -> base dir. res://mods wins over user://mods with the same name: packs can ship
-	# res://mods/<name>/mod.gd, and the dev project symlinks res://mods -> user://mods so the
-	# editor debugger sees mods under res:// paths (breakpoints only hit on that path).
-	var bases := {}
-	for d in DirAccess.get_directories_at(MODS_DIR):
-		bases[d] = MODS_DIR.path_join(d)
-	if DirAccess.dir_exists_absolute("res://mods"):
-		for d in DirAccess.get_directories_at("res://mods"):
-			if FileAccess.file_exists("res://mods/" + d + "/mod.gd"):
-				bases[d] = "res://mods/" + d
-	var names := bases.keys()
+	var names := DirAccess.get_directories_at(MODS_DIR)
 	names.sort()
 	for n in names:
-		var base: String = bases[n]
+		var base := MODS_DIR.path_join(n)
 		var path := base.path_join("mod.gd")
 		if not FileAccess.file_exists(path):
 			continue
@@ -57,10 +37,10 @@ func _load_mods() -> void:
 			push_error("[ModLoader] failed to load " + path)
 			continue
 		var mod: Node = script.new()
-		mod.name = base.get_file()
+		mod.name = n
 		loaded_mods[mod.name] = mod
 		add_child(mod)
-		print("[ModLoader] loaded mod ", mod.name, " from ", base)
+		print("[ModLoader] loaded mod ", mod.name)
 
 
 ## Replace a game script with a subclass of it. Call from a mod's _init() or _ready(),
