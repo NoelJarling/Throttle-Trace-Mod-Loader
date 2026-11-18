@@ -33,3 +33,20 @@ func _ready() -> void:
 		mod.name = n
 		add_child(mod)
 		print("[ModLoader] loaded mod ", mod.name)
+
+
+## For mods, from their _ready(): replaces a game script by an extension of it, a mod script that starts with
+## `extends "res://<game script>.gd"`
+func extend_script(extension_path: String, scenes: Array = []) -> bool:
+	var extension = load(extension_path)
+	var base: Script = extension.get_base_script() if extension is Script else null
+	if base == null or base.resource_path == "" or not extension.can_instantiate():
+		push_error("[ModLoader] can't extend a game script with " + extension_path)
+		return false
+	var path := base.resource_path
+	extension.take_over_path(path)
+	for scene in scenes:
+		if ResourceLoader.has_cached(scene):
+			ResourceLoader.load(scene, "", ResourceLoader.CACHE_MODE_REPLACE)
+	print("[ModLoader] ", path, " extended by ", extension_path)
+	return true
